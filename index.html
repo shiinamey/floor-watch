@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>FLOOR WATCH — Hit-Rarity Correction Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#13151a;
+    --surface:#1b1e24;
+    --surface2:#23272e;
+    --line:#2c3138;
+    --ink:#eae7e0;
+    --ink-dim:#9599a1;
+    --ink-faint:#5c6169;
+    --gold:#d4a054;
+    --gold-dim:#a37f42;
+    --teal:#4fae9c;
+    --rust:#c1604a;
+    --violet:#9b83d6;
+    --blue:#5b93d1;
+    --orange:#d18f4f;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    background:
+      radial-gradient(900px 500px at 10% -10%, rgba(212,160,84,0.06), transparent 60%),
+      radial-gradient(800px 450px at 100% 0%, rgba(79,174,156,0.06), transparent 55%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding-bottom:60px;
+  }
+  ::selection{background:var(--gold); color:#1a1305;}
+
+  header{
+    max-width:1180px;
+    margin:0 auto;
+    padding:40px 20px 20px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--teal);
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow::before{
+    content:''; width:6px; height:6px; border-radius:50%;
+    background:var(--teal); box-shadow:0 0 8px var(--teal);
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-optical-sizing:auto;
+    font-size:clamp(34px,6vw,52px);
+    font-weight:600;
+    margin-top:10px;
+    letter-spacing:-0.01em;
+    line-height:1.02;
+  }
+  h1 em{ font-style:italic; color:var(--gold); font-weight:500; }
+  .sub{
+    color:var(--ink-dim);
+    font-size:15px;
+    margin-top:12px;
+    max-width:640px;
+    line-height:1.6;
+  }
+  .scope-note{
+    margin-top:18px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-left:3px solid var(--rust);
+    border-radius:0 8px 8px 0;
+    padding:14px 16px;
+    font-size:12.5px;
+    color:var(--ink-dim);
+    line-height:1.6;
+    max-width:760px;
+  }
+  .scope-note b{ color:var(--rust); }
+
+  main{ max-width:1180px; margin:0 auto; padding:0 20px; }
+
+  /* ---------- Rarity legend ---------- */
+  .legend{
+    display:flex; flex-wrap:wrap; gap:10px;
+    margin:26px 0 6px;
+  }
+  .legend-item{
+    display:flex; align-items:center; gap:6px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-dim);
+  }
+  .legend-dot{ width:9px; height:9px; border-radius:3px; }
+
+  /* ---------- Filter bar ---------- */
+  .filter-bar{
+    position:sticky; top:0; z-index:30;
+    background:rgba(19,21,26,0.96);
+    backdrop-filter:blur(6px);
+    padding:16px 0;
+    margin-top:10px;
+    border-bottom:1px solid var(--line);
+  }
+  .filter-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .search-wrap{ position:relative; flex:1; min-width:180px; }
+  .search-wrap svg{ position:absolute; left:12px; top:50%; transform:translateY(-50%); width:14px; height:14px; color:var(--ink-faint); }
+  .search-input{
+    width:100%;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 12px 10px 34px;
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+  }
+  .search-input:focus{ outline:none; border-color:var(--gold-dim); }
+  .chip{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    padding:8px 13px;
+    border-radius:20px;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--ink-dim);
+    cursor:pointer;
+    white-space:nowrap;
+    transition:all .15s ease;
+  }
+  .chip:hover{ border-color:var(--gold-dim); color:var(--ink); }
+  .chip.active{ background:var(--gold); border-color:var(--gold); color:#1a1305; font-weight:600; }
+  .chip.active[data-verdict="strong-buy"]{ background:var(--teal); border-color:var(--teal); color:#08211c; }
+  .chip.active[data-verdict="avoid"]{ background:var(--rust); border-color:var(--rust); color:#2a0f09; }
+  .chip-divider{ width:1px; height:20px; background:var(--line); margin:0 2px; }
+
+  .result-count{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-faint);
+    margin-top:10px;
+  }
+
+  /* ---------- Era sections ---------- */
+  .era{ margin-top:36px; }
+  .era-head{
+    display:flex; align-items:baseline; gap:10px;
+    margin-bottom:16px;
+    padding-bottom:10px;
+    border-bottom:1px solid var(--line);
+  }
+  .era-title{
+    font-family:'Fraunces',serif;
+    font-size:19px;
+    font-weight:600;
+  }
+  .era-range{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-faint);
+  }
+
+  .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  @media(max-width:760px){ .grid{ grid-template-columns:1fr; } }
+
+  /* ---------- Card ---------- */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px;
+    position:relative;
+    overflow:hidden;
+  }
+  .card-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .card-name{ font-size:15px; font-weight:700; line-height:1.3; }
+  .card-set{ font-size:11px; color:var(--ink-faint); margin-top:3px; }
+  .rarity-badge{
+    font-family:'JetBrains Mono',monospace;
+    font-size:9.5px;
+    font-weight:700;
+    padding:3px 8px;
+    border-radius:5px;
+    white-space:nowrap;
+    letter-spacing:0.03em;
+  }
+  .rarity-badge.AR{ background:rgba(155,131,214,0.16); color:var(--violet); border:1px solid rgba(155,131,214,0.4); }
+  .rarity-badge.IR{ background:rgba(91,147,209,0.16); color:var(--blue); border:1px solid rgba(91,147,209,0.4); }
+  .rarity-badge.FA{ background:rgba(209,143,79,0.16); color:var(--orange); border:1px solid rgba(209,143,79,0.4); }
+  .rarity-badge.SIR{ background:rgba(212,160,84,0.16); color:var(--gold); border:1px solid rgba(212,160,84,0.4); }
+
+  .price-track{ margin:12px 0 8px; }
+  .track-labels{ display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--ink-faint); margin-bottom:4px; }
+  .track-svg{ display:block; width:100%; height:44px; }
+
+  .price-now{ display:flex; justify-content:space-between; align-items:baseline; margin:8px 0 10px; }
+  .price-now .val{ font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:var(--ink); }
+  .price-now .chg{ font-family:'JetBrains Mono',monospace; font-size:11px; }
+  .chg.down{ color:var(--rust); }
+  .chg.up{ color:var(--teal); }
+  .chg.flat{ color:var(--ink-dim); }
+
+  .verdict-tag{
+    display:inline-flex; align-items:center; gap:5px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:9.5px; font-weight:700;
+    padding:4px 10px;
+    border-radius:20px;
+    text-transform:uppercase;
+    letter-spacing:0.03em;
+    margin-bottom:10px;
+  }
+  .verdict-tag.strong-buy{ background:rgba(79,174,156,0.16); color:var(--teal); border:1px solid rgba(79,174,156,0.4); }
+  .verdict-tag.watch{ background:rgba(212,160,84,0.16); color:var(--gold); border:1px solid rgba(212,160,84,0.4); }
+  .verdict-tag.hold{ background:rgba(149,153,161,0.14); color:var(--ink-dim); border:1px solid var(--line); }
+  .verdict-tag.avoid{ background:rgba(193,96,74,0.16); color:var(--rust); border:1px solid rgba(193,96,74,0.4); }
+
+  .card-note{ font-size:12px; color:var(--ink-dim); line-height:1.55; margin-bottom:10px; }
+  .card-supply{
+    font-size:11px; color:var(--ink-faint);
+    border-top:1px solid var(--line);
+    padding-top:9px;
+    line-height:1.5;
+  }
+  .card-supply b{ color:var(--ink-dim); }
+  .card-src{ font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--ink-faint); margin-top:6px; }
+
+  .empty-state{
+    text-align:center; padding:60px 20px;
+    color:var(--ink-faint); font-family:'JetBrains Mono',monospace; font-size:12.5px;
+    display:none;
+  }
+
+  footer{
+    max-width:1180px; margin:50px auto 0; padding:20px;
+    border-top:1px solid var(--line);
+    font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-faint); line-height:1.7;
+  }
+
+  /* ---------- View toggle ---------- */
+  .view-toggle{
+    display:flex; gap:8px;
+    margin-top:26px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:0;
+  }
+  .view-btn{
+    font-family:'Fraunces',serif;
+    font-size:14px; font-weight:600;
+    padding:10px 4px 12px;
+    background:none; border:none;
+    color:var(--ink-faint);
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    margin-right:20px;
+  }
+  .view-btn.active{ color:var(--gold); border-bottom-color:var(--gold); }
+
+  /* ---------- Sealed cards ---------- */
+  .sealed-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:18px;
+  }
+  .sealed-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px; }
+  .sealed-name{ font-family:'Fraunces',serif; font-size:17px; font-weight:600; }
+  .sealed-set{ font-size:12px; color:var(--ink-faint); margin-top:3px; }
+  .confidence-badge{
+    font-family:'JetBrains Mono',monospace; font-size:9px; padding:3px 8px; border-radius:5px; white-space:nowrap;
+  }
+  .confidence-badge.high{ background:rgba(79,174,156,0.16); color:var(--teal); border:1px solid rgba(79,174,156,0.4); }
+  .confidence-badge.low{ background:rgba(193,96,74,0.16); color:var(--rust); border:1px solid rgba(193,96,74,0.4); }
+  .sealed-figures{ display:flex; gap:20px; margin:14px 0; }
+  .sealed-fig{ flex:1; }
+  .sealed-fig .lbl{ font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--ink-faint); letter-spacing:0.05em; }
+  .sealed-fig .val{ font-family:'JetBrains Mono',monospace; font-size:20px; font-weight:700; margin-top:3px; }
+  .sealed-fig .val.pct{ color:var(--teal); }
+  .sealed-fig .val.unverified{ color:var(--ink-faint); font-size:13px; }
+  .sealed-note{ font-size:12.5px; color:var(--ink-dim); line-height:1.6; margin-bottom:10px; }
+  .sealed-src{ font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--ink-faint); border-top:1px solid var(--line); padding-top:8px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Floor Watch · hit-rarity correction tracker</div>
+  <h1>Find the <em>floor</em>,<br>not the falling knife.</h1>
+  <p class="sub">Every Alternate Art, Illustration Rare, Full Art, and Special Illustration Rare hit across the Sword &amp; Shield era through today — filtered by how far each has corrected off its peak, and whether that floor has real buyer support behind it or is still falling.</p>
+  <div class="scope-note">
+    <b>Honest scope note:</b> there are hundreds of hit-rarity cards across 25+ sets since Sword &amp; Shield — verifying real, sourced pricing for every single one isn't something I can do reliably in one pass. What's below is a curated set of the standout hits per set, each backed by a specific dated source. Ask me to add a specific card or set and I'll research it properly rather than guess.
+  </div>
+</header>
+
+<main>
+
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot" style="background:var(--violet);"></span>AR — Alternate Art (SWSH-era secret)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--blue);"></span>IR — Illustration Rare</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--orange);"></span>FA — Full Art / Ultra Rare</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--gold);"></span>SIR — Special Illustration Rare</span>
+  </div>
+
+  <div class="view-toggle">
+    <button class="view-btn active" data-view="singles" onclick="setView('singles', this)">Singles \u2014 Individual Flips</button>
+    <button class="view-btn" data-view="sealed" onclick="setView('sealed', this)">Sealed \u2014 Long-Term Holds</button>
+  </div>
+
+  <div class="filter-bar">
+    <div class="filter-row">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search card or set…" oninput="applyFilters()">
+      </div>
+      <button class="chip active" data-rarity="all" onclick="setRarity('all', this)">All rarities</button>
+      <button class="chip" data-rarity="AR" onclick="setRarity('AR', this)">AR</button>
+      <button class="chip" data-rarity="IR" onclick="setRarity('IR', this)">IR</button>
+      <button class="chip" data-rarity="FA" onclick="setRarity('FA', this)">FA</button>
+      <button class="chip" data-rarity="SIR" onclick="setRarity('SIR', this)">SIR</button>
+      <div class="chip-divider"></div>
+      <button class="chip active" data-verdict="all" onclick="setVerdict('all', this)">All verdicts</button>
+      <button class="chip" data-verdict="strong-buy" onclick="setVerdict('strong-buy', this)">Strong buy</button>
+      <button class="chip" data-verdict="watch" onclick="setVerdict('watch', this)">Watch</button>
+      <button class="chip" data-verdict="hold" onclick="setVerdict('hold', this)">Hold</button>
+      <button class="chip" data-verdict="avoid" onclick="setVerdict('avoid', this)">Avoid</button>
+    </div>
+    <div class="result-count" id="resultCount"></div>
+  </div>
+
+  <div id="cardContainer"></div>
+  <div class="empty-state" id="emptyState">No cards match this filter — try clearing search or picking a different rarity.</div>
+
+</main>
+
+<footer>
+  FLOOR WATCH — reference tool, not financial advice. Every price cites a dated, named source (TCGplayer-derived trackers, PSA-adjacent pricing sites, Bleeding Cool's monthly Value Watch series). Prices move fast — treat everything here as a starting point to verify against a live listing, not a number to act on directly. Compiled August 2026.
+</footer>
+
+<script>
+  const CARDS = [
+    // ===== Sword & Shield era (2021–2022) =====
+    {
+      name: "Umbreon VMAX", set: "Evolving Skies", era: "swsh",
+      rarity: "AR", num: "215/203",
+      peak: 800, floor: 400, current: 550,
+      verdict: "hold",
+      note: "The benchmark modern alt-art. Raw NM trades $400–600 depending on tracker methodology (some blended trackers cite ~$2,400, likely averaging in graded sales). Up ~728% since 2021 release per pokemonwizard.com tracking.",
+      supply: "Permanently out of print — the whole set is. No reprint can replicate this exact art. PSA 10 premium ($1,200–1,800) comfortably justifies grading a clean copy.",
+      src: "pokemonwizard.com, pokeval.com — Apr 2026"
+    },
+    {
+      name: "Rayquaza VMAX", set: "Evolving Skies", era: "swsh",
+      rarity: "AR", num: "218/203",
+      peak: 1200, floor: 1104, current: 1104,
+      verdict: "hold",
+      note: "Second-tier Evolving Skies anchor behind Umbreon. Market price ~$1,104, up 174.7% since release — still climbing, no real correction to speak of yet.",
+      supply: "Same out-of-print floor as Umbreon, lower collector intensity (Dragon-type vs. the universally-loved Eeveelution line).",
+      src: "pokemonwizard.com — 2026"
+    },
+    {
+      name: "Giratina VSTAR", set: "Crown Zenith · Galarian Gallery", era: "swsh",
+      rarity: "AR", num: "GG69",
+      peak: 425, floor: 385, current: 385,
+      verdict: "strong-buy",
+      note: "Down almost 10% in a single week, off a six-week peak of $425 — but it's the most expensive card in its subset, giving it a real demand floor.",
+      supply: "Crown Zenith is out of print. Correction reads as profit-taking, not thesis failure — worth a floor-buy at current levels.",
+      src: "TCGplayer \u201cBiggest Price Drops\u201d — 22 Jul 2026"
+    },
+
+    // ===== Scarlet & Violet, early (2023–2024) =====
+    {
+      name: "Terapagos ex", set: "Scarlet & Violet (base set)", era: "sv-early",
+      rarity: "SIR", num: "128/091",
+      peak: 80, floor: 33, current: 45,
+      verdict: "strong-buy",
+      note: "Spiked to $80 on a single explosive buying day (avg. 28 copies/buyer — clearly speculative, not organic). TCGplayer's own analysts called the settle point directly: below the $80 high, above the $33 pre-spike floor.",
+      supply: "Base SV set, moderate print run. The speculative spike has fully unwound — this is close to fair value now, a rare case of a clean, analyst-confirmed floor.",
+      src: "TCGplayer Price Trends — 27 May 2026"
+    },
+    {
+      name: "Charizard ex", set: "151 (Scarlet & Violet)", era: "sv-early",
+      rarity: "SIR", num: "199/165",
+      peak: 500, floor: 250, current: 350,
+      verdict: "watch",
+      note: "The set's defining chase — up from ~$250 in January to $350 average, some sales to $500, as fear of the set's print run ending drives real urgency buying.",
+      supply: "151 is winding down print. This is a supply-driven climb, not a correction — you're buying into rising scarcity, not a dip. Confirm current price before paying; the trend has been up all year.",
+      src: "Wargamer — 11 Mar 2026"
+    },
+    {
+      name: "Blastoise ex", set: "151 (Scarlet & Violet)", era: "sv-early",
+      rarity: "SIR", num: "200/165",
+      peak: 200, floor: 60, current: 180,
+      verdict: "watch",
+      note: "Historically traded $60–80 for most of its life, now around $200 — nearly tripled as 151 supply tightens. Same scarcity story as Charizard, smaller collector base.",
+      supply: "Same out-of-print thesis as the rest of 151. Already ran up significantly — less room for a cheap entry than earlier in the year.",
+      src: "Wargamer — 11 Mar 2026"
+    },
+    {
+      name: "Venusaur ex", set: "151 (Scarlet & Violet)", era: "sv-early",
+      rarity: "SIR", num: "198/165",
+      peak: 200, floor: 70, current: 150,
+      verdict: "watch",
+      note: "Up from ~$70 to $150, sales approaching $200. Third of the three starter chases riding 151's scarcity narrative.",
+      supply: "Weakest of the three starter chases historically — worth confirming current demand hasn't cooled before buying at these levels.",
+      src: "Wargamer — 11 Mar 2026"
+    },
+    {
+      name: "Mew ex — \u201cBubble Mew\u201d", set: "Paldean Fates", era: "sv-early",
+      rarity: "SIR", num: "232/091",
+      peak: 999, floor: 700, current: 850,
+      verdict: "watch",
+      note: "The set's top chase, sources disagree on exact price ($706–999 across trackers from Mar–Jul 2026) but agree on the direction: up. Bleeding Cool flagged it as \u201con its way toward Umbreon VMAX-level chase status.\u201d",
+      supply: "Paldean Fates remains in periodic restock through Pokémon Center — less scarcity-driven than 151, more pure character-demand (Mew nostalgia).",
+      src: "Bleeding Cool, Cardrake, Eyevo — Mar\u2013Jul 2026 (figures vary by source)"
+    },
+    {
+      name: "Shiny Charizard ex", set: "Paldean Fates", era: "sv-early",
+      rarity: "SIR", num: "234/091",
+      peak: 380, floor: 128, current: 260,
+      verdict: "watch",
+      note: "Wide price disagreement across trackers ($128–380) suggests real volatility, not just data noise. Verify a live listing before treating any single number here as reliable.",
+      supply: "Same restock-available supply profile as Mew ex above — less scarcity pressure than a fully out-of-print set.",
+      src: "Bleeding Cool, Cardrake — Mar\u2013Jun 2026"
+    },
+
+    // ===== Scarlet & Violet, late (2024–2025) =====
+    {
+      name: "Umbreon ex", set: "Prismatic Evolutions", era: "sv-late",
+      rarity: "SIR", num: "161/131",
+      peak: 1600, floor: 830, current: 882,
+      verdict: "strong-buy",
+      note: "The textbook floor case study: launched over $1,000, peaked ~$1,600 in April 2025 on scalper-driven demand, bottomed at $830 in February 2026, now sitting at $882 — a 45% peak-to-trough correction that has visibly bounced and held.",
+      supply: "Larger initial print run than Evolving Skies, with ongoing reprints — a real ceiling on how high this goes, but the $800–900 zone has now been defended twice. Real collector base, not just scalpers.",
+      src: "PokemonPriceTracker.com — 2026"
+    },
+    {
+      name: "Pikachu ex", set: "Surging Sparks", era: "sv-late",
+      rarity: "SIR", num: "238/191",
+      peak: 450, floor: 70, current: 130,
+      verdict: "strong-buy",
+      note: "Bottomed near $70 post-release, gradually recovering. Trades at roughly a third of the set's Hyper Rare Pikachu price — the accessible way into the set's mascot-driven demand without paying HR prices.",
+      supply: "No Charizard SIR in this set was actually a feature — gave Surging Sparks a clean Pikachu-only identity instead of competing with every other Charizard-led set.",
+      src: "misprint.com — 24 Feb 2026"
+    },
+    {
+      name: "Latias EX", set: "Surging Sparks", era: "sv-late",
+      rarity: "SIR", num: "239/191",
+      peak: 90, floor: 80, current: 85,
+      verdict: "hold",
+      note: "\u201cFound its level and isn't budging\u201d per direct trend analysis — stable pricing means real collector demand set the floor, not speculation.",
+      supply: "Not an exciting flip, but a reassuring hold — the kind of card whose price you can actually trust.",
+      src: "misprint.com — 24 Feb 2026"
+    },
+    {
+      name: "Giratina VSTAR — Alt Art", set: "Lost Origin", era: "swsh",
+      rarity: "AR", num: "212/196",
+      peak: 90, floor: 60, current: 75,
+      verdict: "hold",
+      note: "The set's crown jewel — competitive powerhouse (dominated Standard 2022–23) plus display-piece art. Raw NM trades $60–90, PSA 10 $150–220. Market described as stable with steady, unspectacular demand.",
+      supply: "~2,500 PSA 10 population. No major catalysts expected — raw copies are gradually being absorbed into grading submissions, slowly tightening supply. A patient accumulation play, not a fast flip.",
+      src: "pokeval.com — 2026"
+    },
+    {
+      name: "Giratina V — Alt Full Art", set: "Lost Origin", era: "swsh",
+      rarity: "AR", num: "186/196",
+      peak: 5000, floor: 734, current: 858,
+      verdict: "watch",
+      note: "Different card from the VSTAR Alt Art above — up 295.6% since release to $858.75. Sale range is huge ($734–5,000), meaning a handful of outlier sales skew the top end; treat $734–900 as the real trading range.",
+      supply: "Same Lost Origin scarcity thesis, but noisier price data than its VSTAR sibling — verify a tight recent sold-comp range before paying near the top of that spread.",
+      src: "pokemonwizard.com — 2026"
+    },
+    {
+      name: "Team Rocket's Mewtwo ex", set: "Destined Rivals", era: "sv-late",
+      rarity: "SIR", num: "213/182",
+      peak: 60, floor: 55, current: 58,
+      verdict: "avoid",
+      note: "Assessed as collector-grade only, not a strong flip candidate — no identified price catalyst and the set remains in active print, meaning no scarcity floor has formed yet.",
+      supply: "Active print run still ongoing. Revisit once the set approaches out-of-print status; buying now means competing with continued fresh supply.",
+      src: "Cross-session analysis — verify live price before acting"
+    },
+    {
+      name: "Milotic EX", set: "Surging Sparks", era: "sv-late",
+      rarity: "SIR", num: "237/191",
+      peak: 90, floor: 80, current: 85,
+      verdict: "hold",
+      note: "Stable in its trading range — not a speculator's card, but a steady one for collectors who like the art.",
+      supply: "Same stability profile as Latias EX above.",
+      src: "misprint.com — 24 Feb 2026"
+    },
+    {
+      name: "Hydreigon EX", set: "Surging Sparks", era: "sv-late",
+      rarity: "SIR", num: "240/191",
+      peak: 100, floor: 90, current: 90,
+      verdict: "avoid",
+      note: "Lost about 10% from its initial settling price. Dragon-types often have a smaller real collector base than initial market pricing assumes.",
+      supply: "Weak fundamentals case — the drop reflects the market correcting toward genuine (lower) demand, not a temporary dip.",
+      src: "misprint.com — 24 Feb 2026"
+    },
+    {
+      name: "Alolan Exeggutor EX", set: "Surging Sparks", era: "sv-late",
+      rarity: "SIR", num: "242/191",
+      peak: 60, floor: 50, current: 50,
+      verdict: "avoid",
+      note: "Down slightly as the novelty/meme factor that drove initial demand faded. Still holds some value, but the thesis that pumped it originally is gone.",
+      supply: "A reminder that meme-driven pulls rarely hold their initial hype price once the joke stops being fresh.",
+      src: "misprint.com — 24 Feb 2026"
+    },
+
+    // ===== Mega Evolution era (2026, current) =====
+    {
+      name: "Gengar ex", set: "Mega Evolution: Ascended Heroes", era: "mega",
+      rarity: "SIR", num: "—",
+      peak: 1400, floor: 1275, current: 1275,
+      verdict: "watch",
+      note: "The set's clear #1 chase, retracing from a ~$1,400 peak to $1,275 as the broader July 2026 market cooling hit even top-tier cards. Floor not yet confirmed — could still have room to fall.",
+      supply: "Current-print set — still being actively printed, meaning the scarcity floor other cards on this list benefit from doesn't apply yet.",
+      src: "TCGplayer Price Trends — 22 Jul 2026"
+    },
+    {
+      name: "Mega Charizard X ex", set: "Phantasmal Flames", era: "mega",
+      rarity: "SIR", num: "125/094",
+      peak: 1000, floor: 428, current: 750,
+      verdict: "strong-buy",
+      note: "Genuinely volatile — sales ranged $500–1,000 in a single month, with listings as low as $428 seen. ~22,500 PSA-graded copies signal real market depth, not a thin/illiquid card.",
+      supply: "Current-print set, but the grading volume alone makes this a liquid, executable flip rather than a theoretical one.",
+      src: "TCGplayer Price Trends, 29 Jul 2026; PSA population via eBay listing data, Apr 2026"
+    },
+    {
+      name: "Pikachu ex \u2014 \u201cTreekachu\u201d", set: "Ascended Heroes", era: "mega",
+      rarity: "SIR", num: "276/217",
+      peak: 1400, floor: 1000, current: 1150,
+      verdict: "watch",
+      note: "Rocketed $600\u2192$1,400 in a month, now retracing. Pull-rate math gives it a structural floor: ~1-in-1,540 pack odds means pulling one from sealed ETBs costs roughly $22,000 on average — a real anchor even if hype fades.",
+      supply: "Current-print set. Big-ticket, high-conviction hold if you believe the pull-rate math; confirm the live floor before committing this much capital.",
+      src: "TCGplayer Price Trends, 29 Jul 2026; pull-rate data per PokeBeach via PokeSats, 22 May 2026"
+    },
+  ];
+
+  const SEALED = [
+    {
+      name: "Booster Box", set: "Evolving Skies", era: "swsh",
+      msrp: 149.99, current: 2635, pct: 1383,
+      confidence: "high",
+      note: "The clearest sealed-hold proof-of-concept in modern Pok\u00e9mon. Bought at launch MSRP and held, this is a +1,383% return \u2014 but at $2,635 today, new money faces a completely different risk/reward than a 2021 buyer did.",
+      src: "Cross-referenced multiple trackers \u2014 2026"
+    },
+    {
+      name: "Booster Box", set: "Lost Origin", era: "swsh",
+      msrp: 99.99, current: 130, pct: 30,
+      confidence: "high",
+      note: "Modest but real appreciation \u2014 climbing steadily above $130 as the set ages out of primary distribution. Not a dramatic mover like Evolving Skies, but a lower-risk, lower-entry-cost hold.",
+      src: "pokeval.com \u2014 2026"
+    },
+    {
+      name: "Elite Trainer Box", set: "Crown Zenith", era: "swsh",
+      msrp: 49.99, current: null, pct: null,
+      confidence: "low",
+      note: "Out of print with a strong qualitative appreciation signal (Galarian Gallery singles like Giratina VSTAR/Arceus VSTAR hold real demand), but I don't have a verified current sealed box price from this research pass \u2014 confirm a live listing before treating this as a numbers-backed hold.",
+      src: "Unverified this session \u2014 check live listing"
+    },
+    {
+      name: "Booster Bundle / ETB", set: "151 (Scarlet & Violet)", era: "sv-early",
+      msrp: 42.99, current: null, pct: null,
+      confidence: "low",
+      note: "Singles are climbing hard as this set's print run winds down (Charizard ex SIR alone up from $250 to $350 this year) \u2014 sealed product should follow the same scarcity logic, but I don't have a precise current box/bundle price verified. Directionally strong, numerically unconfirmed.",
+      src: "Wargamer — 11 Mar 2026 (singles data only, sealed unverified)"
+    },
+    {
+      name: "Booster Box", set: "Prismatic Evolutions", era: "sv-late",
+      msrp: 159.99, current: null, pct: null,
+      confidence: "low",
+      note: "Caution, not a clean hold thesis: this set had a significantly larger initial print run than Evolving Skies, and Pok\u00e9mon Company has continued reprinting it. Singles like Umbreon ex are genuinely good (see Singles tab), but sealed box appreciation is structurally capped while reprints continue.",
+      src: "pokemonpricetracker.com — 2026"
+    },
+  ];
+
+  let activeRarity = 'all';
+  let activeVerdict = 'all';
+  let activeView = 'singles';
+
+  const ERA_LABELS = {
+    'swsh': { title: 'Sword & Shield Era', range: '2021\u20132022 \u00b7 out of print, established floors' },
+    'sv-early': { title: 'Scarlet & Violet \u2014 Early', range: '2023\u20132024 \u00b7 mixed print status' },
+    'sv-late': { title: 'Scarlet & Violet \u2014 Late', range: '2024\u20132025 \u00b7 some corrections underway' },
+    'mega': { title: 'Mega Evolution Era', range: '2026 \u00b7 current print, floors still forming' },
+  };
+  const ERA_ORDER = ['mega', 'sv-late', 'sv-early', 'swsh'];
+
+  function fmtUSD(n){ return '$' + n.toLocaleString('en-US'); }
+
+  function sparkline(peak, floor, current){
+    const w = 300, h = 44, pad = 6;
+    const max = peak, min = Math.min(floor, current) * 0.9;
+    const range = max - min || 1;
+    const yOf = v => h - pad - ((v - min) / range) * (h - pad*2);
+    const pts = [
+      { x: 10, y: yOf(peak) },
+      { x: w/2, y: yOf(floor) },
+      { x: w-10, y: yOf(current) },
+    ];
+    const line = `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y}`;
+    const fill = `${line} L${pts[2].x},${h} L${pts[0].x},${h} Z`;
+    const floorY = yOf(floor);
+    const bounced = current > floor;
+    const lineColor = current >= peak * 0.9 ? 'var(--teal)' : (current <= floor * 1.05 ? 'var(--rust)' : 'var(--gold)');
+    return `<svg class="track-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+      <path d="${fill}" fill="${lineColor}" opacity="0.12" stroke="none"/>
+      <line x1="0" y1="${floorY}" x2="${w}" y2="${floorY}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3,3"/>
+      <path d="${line}" fill="none" stroke="${lineColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="${pts[0].x}" cy="${pts[0].y}" r="3" fill="${lineColor}"/>
+      <circle cx="${pts[1].x}" cy="${pts[1].y}" r="3" fill="var(--ink-faint)"/>
+      <circle cx="${pts[2].x}" cy="${pts[2].y}" r="3.5" fill="${lineColor}"/>
+    </svg>`;
+  }
+
+  function cardHTML(c){
+    const pctFromPeak = Math.round(((c.current - c.peak) / c.peak) * 100);
+    const chgClass = pctFromPeak < -5 ? 'down' : (pctFromPeak > 5 ? 'up' : 'flat');
+    const verdictLabel = { 'strong-buy':'Strong Buy \u2014 Floor Confirmed', 'watch':'Watch \u2014 Correcting', 'hold':'Hold \u2014 Stable', 'avoid':'Avoid \u2014 Weak Thesis' }[c.verdict];
+    return `
+      <div class="card" data-rarity="${c.rarity}" data-verdict="${c.verdict}" data-search="${(c.name+' '+c.set).toLowerCase()}">
+        <div class="card-top">
+          <div><div class="card-name">${c.name}</div><div class="card-set">${c.set}${c.num !== '\u2014' ? ' \u00b7 ' + c.num : ''}</div></div>
+          <span class="rarity-badge ${c.rarity}">${c.rarity}</span>
+        </div>
+        <div class="verdict-tag ${c.verdict}" style="margin-top:10px;">${verdictLabel}</div>
+        <div class="price-track">
+          <div class="track-labels"><span>PEAK ${fmtUSD(c.peak)}</span><span>FLOOR ${fmtUSD(c.floor)}</span><span>NOW ${fmtUSD(c.current)}</span></div>
+          ${sparkline(c.peak, c.floor, c.current)}
+        </div>
+        <div class="price-now">
+          <span class="val">${fmtUSD(c.current)}</span>
+          <span class="chg ${chgClass}">${pctFromPeak > 0 ? '+' : ''}${pctFromPeak}% off peak</span>
+        </div>
+        <p class="card-note">${c.note}</p>
+        <div class="card-supply"><b>Supply/demand:</b> ${c.supply}</div>
+        <div class="card-src">Source: ${c.src}</div>
+      </div>
+    `;
+  }
+
+  function sealedCardHTML(s){
+    const hasData = s.current !== null;
+    return `
+      <div class="sealed-card">
+        <div class="sealed-top">
+          <div><div class="sealed-name">${s.name}</div><div class="sealed-set">${s.set}</div></div>
+          <span class="confidence-badge ${s.confidence}">${s.confidence === 'high' ? 'Verified' : 'Low confidence'}</span>
+        </div>
+        <div class="sealed-figures">
+          <div class="sealed-fig"><div class="lbl">LAUNCH MSRP</div><div class="val">$${s.msrp.toLocaleString('en-US')}</div></div>
+          <div class="sealed-fig"><div class="lbl">CURRENT</div><div class="val ${hasData ? '' : 'unverified'}">${hasData ? '$' + s.current.toLocaleString('en-US') : 'Unverified'}</div></div>
+          <div class="sealed-fig"><div class="lbl">RETURN</div><div class="val ${hasData ? 'pct' : 'unverified'}">${hasData ? '+' + s.pct + '%' : '\u2014'}</div></div>
+        </div>
+        <p class="sealed-note">${s.note}</p>
+        <div class="sealed-src">Source: ${s.src}</div>
+      </div>
+    `;
+  }
+
+  function render(){
+    const container = document.getElementById('cardContainer');
+    const q = document.getElementById('searchInput').value.trim().toLowerCase();
+
+    if(activeView === 'sealed'){
+      let visibleTotal = 0;
+      let html = '';
+      ERA_ORDER.forEach(eraKey => {
+        const itemsInEra = SEALED.filter(s => {
+          if(s.era !== eraKey) return false;
+          if(q && !(s.name+' '+s.set).toLowerCase().includes(q)) return false;
+          return true;
+        });
+        if(itemsInEra.length === 0) return;
+        visibleTotal += itemsInEra.length;
+        const era = ERA_LABELS[eraKey];
+        html += `
+          <div class="era">
+            <div class="era-head"><div class="era-title">${era.title}</div><div class="era-range">${era.range}</div></div>
+            <div class="grid">${itemsInEra.map(sealedCardHTML).join('')}</div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+      document.getElementById('emptyState').style.display = visibleTotal === 0 ? 'block' : 'none';
+      document.getElementById('resultCount').textContent = `Showing ${visibleTotal} of ${SEALED.length} tracked sealed products`;
+      return;
+    }
+
+    let visibleTotal = 0;
+    let html = '';
+
+    ERA_ORDER.forEach(eraKey => {
+      const cardsInEra = CARDS.filter(c => {
+        if(c.era !== eraKey) return false;
+        if(activeRarity !== 'all' && c.rarity !== activeRarity) return false;
+        if(activeVerdict !== 'all' && c.verdict !== activeVerdict) return false;
+        if(q && !(c.name+' '+c.set).toLowerCase().includes(q)) return false;
+        return true;
+      });
+      if(cardsInEra.length === 0) return;
+      visibleTotal += cardsInEra.length;
+      const era = ERA_LABELS[eraKey];
+      html += `
+        <div class="era">
+          <div class="era-head"><div class="era-title">${era.title}</div><div class="era-range">${era.range}</div></div>
+          <div class="grid">${cardsInEra.map(cardHTML).join('')}</div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+    document.getElementById('emptyState').style.display = visibleTotal === 0 ? 'block' : 'none';
+    document.getElementById('resultCount').textContent = `Showing ${visibleTotal} of ${CARDS.length} tracked hits`;
+  }
+
+  function setView(val, btn){
+    activeView = val;
+    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filterControls = document.querySelectorAll('.chip[data-rarity], .chip[data-verdict], .chip-divider');
+    filterControls.forEach(el => el.style.display = val === 'sealed' ? 'none' : '');
+    render();
+  }
+
+  function setRarity(val, btn){
+    activeRarity = val;
+    document.querySelectorAll('.chip[data-rarity]').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  }
+  function setVerdict(val, btn){
+    activeVerdict = val;
+    document.querySelectorAll('.chip[data-verdict]').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  }
+  function applyFilters(){ render(); }
+
+  render();
+</script>
+
+</body>
+</html>
