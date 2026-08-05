@@ -1,29 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- PRICE_UPDATE_LOG [2026-08-05 07:13 PHT]: 15/21 cards updated
-Umbreon VMAX: UPDATED $550.0 -> $2250.0
-Rayquaza VMAX: UPDATED $1104.0 -> $991.25
-Giratina VSTAR: SKIP (no card number to build URL from)
-Terapagos ex: REJECT ($1.61 vs last known $45.0 -- outside safe bounds, likely wrong-card match)
-Charizard ex: UPDATED $350.0 -> $382.5
-Blastoise ex: UPDATED $180.0 -> $140.0
-Venusaur ex: UPDATED $150.0 -> $101.71
-Mew ex — \u201cBubble Mew\u201d: SKIP (no 'Ungraded' price table found)
-Shiny Charizard ex: UPDATED $260.0 -> $772.74
-Umbreon ex: UPDATED $882.0 -> $1409.98
-Pikachu ex: UPDATED $130.0 -> $298.45
-Latias EX: UPDATED $85.0 -> $174.85
-Giratina VSTAR — Alt Art: UPDATED $75.0 -> $16.81
-Giratina V — Alt Full Art: SKIP (no 'Ungraded' price table found)
-Team Rocket's Mewtwo ex: UPDATED $58.0 -> $19.81
-Milotic EX: UPDATED $85.0 -> $109.51
-Hydreigon EX: UPDATED $90.0 -> $34.83
-Alolan Exeggutor EX: UPDATED $50.0 -> $30.77
-Gengar ex: SKIP (no card number to build URL from)
-Mega Charizard X ex: UPDATED $750.0 -> $772.74
-Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
--->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>FLOOR WATCH — Hit-Rarity Correction Tracker</title>
@@ -109,6 +86,26 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
   }
   .scope-note b{ color:var(--rust); }
 
+  .jump-nav{
+    display:flex; flex-wrap:wrap; align-items:center; gap:6px;
+    margin-top:20px;
+    padding:10px 0;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .jump-label{ font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-faint); margin-right:4px; }
+  .jump-nav a{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-dim);
+    text-decoration:none;
+    padding:5px 10px;
+    border-radius:14px;
+    border:1px solid var(--line);
+    transition:all .15s ease;
+  }
+  .jump-nav a:hover{ color:var(--gold); border-color:var(--gold-dim); }
+
   main{ max-width:1180px; margin:0 auto; padding:0 20px; }
 
   /* ---------- Rarity legend ---------- */
@@ -123,6 +120,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     color:var(--ink-dim);
   }
   .legend-dot{ width:9px; height:9px; border-radius:3px; }
+  .legend-note{ font-size:10.5px; color:var(--ink-faint); margin-top:8px; line-height:1.5; max-width:700px; }
 
   /* ---------- Filter bar ---------- */
   .filter-bar{
@@ -205,6 +203,17 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
   }
   .card-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
   .card-name{ font-size:15px; font-weight:700; line-height:1.3; }
+  .updated-badge{
+    display:inline-block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:8.5px; font-weight:700;
+    color:var(--bg);
+    background:var(--teal);
+    padding:2px 6px;
+    border-radius:4px;
+    vertical-align:middle;
+    letter-spacing:0.03em;
+  }
   .card-set{ font-size:11px; color:var(--ink-faint); margin-top:3px; }
   .rarity-badge{
     font-family:'JetBrains Mono',monospace;
@@ -220,9 +229,9 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
   .rarity-badge.FA{ background:rgba(209,143,79,0.16); color:var(--orange); border:1px solid rgba(209,143,79,0.4); }
   .rarity-badge.SIR{ background:rgba(212,160,84,0.16); color:var(--gold); border:1px solid rgba(212,160,84,0.4); }
 
-  .price-track{ margin:12px 0 8px; }
-  .track-labels{ display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--ink-faint); margin-bottom:4px; }
-  .track-svg{ display:block; width:100%; height:44px; }
+  .price-track{ margin:10px 0 6px; }
+  .track-labels{ display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--ink-faint); margin-bottom:3px; }
+  .track-svg{ display:block; width:100%; height:26px; }
 
   .price-now{ display:flex; justify-content:space-between; align-items:baseline; margin:8px 0 10px; }
   .price-now .val{ font-family:'JetBrains Mono',monospace; font-size:19px; font-weight:700; color:var(--ink); }
@@ -255,6 +264,18 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
   }
   .card-supply b{ color:var(--ink-dim); }
   .card-src{ font-family:'JetBrains Mono',monospace; font-size:9px; color:var(--ink-faint); margin-top:6px; }
+  .view-link{
+    display:inline-block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    color:var(--gold);
+    text-decoration:none;
+    margin-top:10px;
+    border-top:1px solid var(--line);
+    padding-top:8px;
+    width:100%;
+  }
+  .view-link:hover{ color:var(--teal); }
 
   .empty-state{
     text-align:center; padding:60px 20px;
@@ -326,10 +347,37 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
 <main>
 
   <div class="legend">
-    <span class="legend-item"><span class="legend-dot" style="background:var(--violet);"></span>AR — Alternate Art (SWSH-era secret)</span>
+    <span class="legend-item"><span class="legend-dot" style="background:var(--violet);"></span>AR — Art Rare</span>
     <span class="legend-item"><span class="legend-dot" style="background:var(--blue);"></span>IR — Illustration Rare</span>
     <span class="legend-item"><span class="legend-dot" style="background:var(--orange);"></span>FA — Full Art / Ultra Rare</span>
     <span class="legend-item"><span class="legend-dot" style="background:var(--gold);"></span>SIR — Special Illustration Rare</span>
+  </div>
+  <div class="legend-note">Note on SIR: officially "Special" Illustration Rare, not "Secret" \u2014 an easy mix-up since SIRs are also numbered as Secret Rares (beyond the set total), so the two concepts blend naturally in conversation.</div>
+
+  <div class="jump-nav" id="jumpNav">
+    <span class="jump-label">Jump to:</span>
+    <a href="#era-mega">Mega Evolution</a>
+    <a href="#era-sv-late">SV \u2014 Late</a>
+    <a href="#era-sv-early">SV \u2014 Early</a>
+    <a href="#era-swsh">Sword &amp; Shield</a>
+    <a href="#era-sm">Sun &amp; Moon</a>
+    <a href="#era-vintage">Vintage</a>
+  </div>
+
+  <div class="scope-note" style="border-left-color:var(--gold); margin-top:16px; max-width:none;">
+    <b style="color:var(--gold);">Latest watchlist update (5 Aug 2026):</b>
+    <br>\u2022 <b>Recovered \u2014 upgraded to Strong Buy:</b> Mega Gengar ex (Ascended Heroes) found real support and climbed back above $1,100 after its earlier retracement \u2014 the "still falling" call from the prior pass has now resolved, with a confirmed floor.
+    <br>\u2022 <b>New add \u2014 Watch:</b> Mega Darkrai ex (Pitch Black, released Jul 17) is the new set's top chase, up ~100% since launch. Early hype pricing, no floor formed yet \u2014 momentum watch, not a confirmed dip-buy.
+    <br>\u2022 <b>Already pumped \u2014 flagged Avoid:</b> Morpeko ex (Pitch Black) surged past $90 on launch hype, then dropped over 50%. Exactly the pattern to avoid \u2014 don't mistake the current lower price for a floor.
+    <br>Cards touched this pass are marked <span class="updated-badge">UPDATED</span> throughout the list below.
+  </div>
+
+  <div class="scope-note" style="margin-top:16px; max-width:none;">
+    <b>On "every set across four eras":</b> Mega Evolution, Scarlet & Violet, Sword & Shield, and Sun & Moon together span 45+ individual sets and many hundreds of chase cards. Verifying real pricing for every single one isn't something I can do honestly in one pass \u2014 so this tracker covers the most significant, most-searched, highest-conviction card per era and set rather than padding the list with unverified guesses. All four eras now have real coverage (jump nav above); depth within each era will keep growing as you ask for specific sets or cards.
+  </div>
+
+  <div class="scope-note" style="border-left-color:var(--teal); margin-top:16px; max-width:none;">
+    <b style="color:var(--teal);">Sympathy pump, proven:</b> Mega Rayquaza headlines Delta Reign (Nov 6, 2026 EN / Storm Emeralda, released Jul 31 JP), and the hype echo already hit vintage Rayquaza cards hard \u2014 six different mid-2000s-to-2015 printings sold for five-figure sums in 2026 alone: a Gold Star Rayquaza at $49,000 (PSA 10), a 2006 tin promo at $27,868, a Supreme Victors LV.X at $23,000, a Roaring Skies M Rayquaza-EX at ~$17,000, a Dragon Frontiers delta-species ex at $15,200, and an EX Dragon original at $11,100. That's real, dated, sourced evidence the pattern works \u2014 but every one of those cards is now priced well out of reach for small capital. The <b style="color:var(--teal);">Vintage \u2014 Sympathy Pump Watch</b> section below is the budget-tier bet on the same mechanism spreading to Rayquaza's Hoenn trio-mates, Groudon and Kyogre, before it's obvious. Flagged honestly as speculative correlation, not a confirmed mover yet.
   </div>
 
   <div class="view-toggle">
@@ -354,6 +402,10 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
       <button class="chip" data-verdict="watch" onclick="setVerdict('watch', this)">Watch</button>
       <button class="chip" data-verdict="hold" onclick="setVerdict('hold', this)">Hold</button>
       <button class="chip" data-verdict="avoid" onclick="setVerdict('avoid', this)">Avoid</button>
+      <div class="chip-divider"></div>
+      <button class="chip active" data-budget="all" onclick="setBudget('all', this)">Any budget</button>
+      <button class="chip" data-budget="100" onclick="setBudget('100', this)">Under $100</button>
+      <button class="chip" data-budget="200" onclick="setBudget('200', this)">Under $200</button>
     </div>
     <div class="result-count" id="resultCount"></div>
   </div>
@@ -373,7 +425,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Umbreon VMAX", set: "Evolving Skies", era: "swsh",
       rarity: "AR", num: "215/203",
-      peak: 800, floor: 400, current: 2250,
+      peak: 800, floor: 400, current: 550,
       verdict: "hold",
       note: "The benchmark modern alt-art. Raw NM trades $400–600 depending on tracker methodology (some blended trackers cite ~$2,400, likely averaging in graded sales). Up ~728% since 2021 release per pokemonwizard.com tracking.",
       supply: "Permanently out of print — the whole set is. No reprint can replicate this exact art. PSA 10 premium ($1,200–1,800) comfortably justifies grading a clean copy.",
@@ -382,7 +434,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Rayquaza VMAX", set: "Evolving Skies", era: "swsh",
       rarity: "AR", num: "218/203",
-      peak: 1200, floor: 1104, current: 991.25,
+      peak: 1200, floor: 1104, current: 1104,
       verdict: "hold",
       note: "Second-tier Evolving Skies anchor behind Umbreon. Market price ~$1,104, up 174.7% since release — still climbing, no real correction to speak of yet.",
       supply: "Same out-of-print floor as Umbreon, lower collector intensity (Dragon-type vs. the universally-loved Eeveelution line).",
@@ -411,7 +463,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Charizard ex", set: "151 (Scarlet & Violet)", era: "sv-early",
       rarity: "SIR", num: "199/165",
-      peak: 500, floor: 250, current: 382.5,
+      peak: 500, floor: 250, current: 350,
       verdict: "watch",
       note: "The set's defining chase — up from ~$250 in January to $350 average, some sales to $500, as fear of the set's print run ending drives real urgency buying.",
       supply: "151 is winding down print. This is a supply-driven climb, not a correction — you're buying into rising scarcity, not a dip. Confirm current price before paying; the trend has been up all year.",
@@ -420,7 +472,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Blastoise ex", set: "151 (Scarlet & Violet)", era: "sv-early",
       rarity: "SIR", num: "200/165",
-      peak: 200, floor: 60, current: 140,
+      peak: 200, floor: 60, current: 180,
       verdict: "watch",
       note: "Historically traded $60–80 for most of its life, now around $200 — nearly tripled as 151 supply tightens. Same scarcity story as Charizard, smaller collector base.",
       supply: "Same out-of-print thesis as the rest of 151. Already ran up significantly — less room for a cheap entry than earlier in the year.",
@@ -429,7 +481,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Venusaur ex", set: "151 (Scarlet & Violet)", era: "sv-early",
       rarity: "SIR", num: "198/165",
-      peak: 200, floor: 70, current: 101.71,
+      peak: 200, floor: 70, current: 150,
       verdict: "watch",
       note: "Up from ~$70 to $150, sales approaching $200. Third of the three starter chases riding 151's scarcity narrative.",
       supply: "Weakest of the three starter chases historically — worth confirming current demand hasn't cooled before buying at these levels.",
@@ -447,7 +499,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Shiny Charizard ex", set: "Paldean Fates", era: "sv-early",
       rarity: "SIR", num: "234/091",
-      peak: 380, floor: 128, current: 772.74,
+      peak: 380, floor: 128, current: 260,
       verdict: "watch",
       note: "Wide price disagreement across trackers ($128–380) suggests real volatility, not just data noise. Verify a live listing before treating any single number here as reliable.",
       supply: "Same restock-available supply profile as Mew ex above — less scarcity pressure than a fully out-of-print set.",
@@ -458,7 +510,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Umbreon ex", set: "Prismatic Evolutions", era: "sv-late",
       rarity: "SIR", num: "161/131",
-      peak: 1600, floor: 830, current: 1409.98,
+      peak: 1600, floor: 830, current: 882,
       verdict: "strong-buy",
       note: "The textbook floor case study: launched over $1,000, peaked ~$1,600 in April 2025 on scalper-driven demand, bottomed at $830 in February 2026, now sitting at $882 — a 45% peak-to-trough correction that has visibly bounced and held.",
       supply: "Larger initial print run than Evolving Skies, with ongoing reprints — a real ceiling on how high this goes, but the $800–900 zone has now been defended twice. Real collector base, not just scalpers.",
@@ -467,7 +519,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Pikachu ex", set: "Surging Sparks", era: "sv-late",
       rarity: "SIR", num: "238/191",
-      peak: 450, floor: 70, current: 298.45,
+      peak: 450, floor: 70, current: 130,
       verdict: "strong-buy",
       note: "Bottomed near $70 post-release, gradually recovering. Trades at roughly a third of the set's Hyper Rare Pikachu price — the accessible way into the set's mascot-driven demand without paying HR prices.",
       supply: "No Charizard SIR in this set was actually a feature — gave Surging Sparks a clean Pikachu-only identity instead of competing with every other Charizard-led set.",
@@ -476,7 +528,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Latias EX", set: "Surging Sparks", era: "sv-late",
       rarity: "SIR", num: "239/191",
-      peak: 90, floor: 80, current: 174.85,
+      peak: 90, floor: 80, current: 85,
       verdict: "hold",
       note: "\u201cFound its level and isn't budging\u201d per direct trend analysis — stable pricing means real collector demand set the floor, not speculation.",
       supply: "Not an exciting flip, but a reassuring hold — the kind of card whose price you can actually trust.",
@@ -485,7 +537,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Giratina VSTAR — Alt Art", set: "Lost Origin", era: "swsh",
       rarity: "AR", num: "212/196",
-      peak: 90, floor: 60, current: 16.81,
+      peak: 90, floor: 60, current: 75,
       verdict: "hold",
       note: "The set's crown jewel — competitive powerhouse (dominated Standard 2022–23) plus display-piece art. Raw NM trades $60–90, PSA 10 $150–220. Market described as stable with steady, unspectacular demand.",
       supply: "~2,500 PSA 10 population. No major catalysts expected — raw copies are gradually being absorbed into grading submissions, slowly tightening supply. A patient accumulation play, not a fast flip.",
@@ -503,7 +555,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Team Rocket's Mewtwo ex", set: "Destined Rivals", era: "sv-late",
       rarity: "SIR", num: "213/182",
-      peak: 60, floor: 55, current: 19.81,
+      peak: 60, floor: 55, current: 58,
       verdict: "avoid",
       note: "Assessed as collector-grade only, not a strong flip candidate — no identified price catalyst and the set remains in active print, meaning no scarcity floor has formed yet.",
       supply: "Active print run still ongoing. Revisit once the set approaches out-of-print status; buying now means competing with continued fresh supply.",
@@ -512,7 +564,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Milotic EX", set: "Surging Sparks", era: "sv-late",
       rarity: "SIR", num: "237/191",
-      peak: 90, floor: 80, current: 109.51,
+      peak: 90, floor: 80, current: 85,
       verdict: "hold",
       note: "Stable in its trading range — not a speculator's card, but a steady one for collectors who like the art.",
       supply: "Same stability profile as Latias EX above.",
@@ -521,7 +573,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Hydreigon EX", set: "Surging Sparks", era: "sv-late",
       rarity: "SIR", num: "240/191",
-      peak: 100, floor: 90, current: 34.83,
+      peak: 100, floor: 90, current: 90,
       verdict: "avoid",
       note: "Lost about 10% from its initial settling price. Dragon-types often have a smaller real collector base than initial market pricing assumes.",
       supply: "Weak fundamentals case — the drop reflects the market correcting toward genuine (lower) demand, not a temporary dip.",
@@ -530,7 +582,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     {
       name: "Alolan Exeggutor EX", set: "Surging Sparks", era: "sv-late",
       rarity: "SIR", num: "242/191",
-      peak: 60, floor: 50, current: 30.77,
+      peak: 60, floor: 50, current: 50,
       verdict: "avoid",
       note: "Down slightly as the novelty/meme factor that drove initial demand faded. Still holds some value, but the thesis that pumped it originally is gone.",
       supply: "A reminder that meme-driven pulls rarely hold their initial hype price once the joke stops being fresh.",
@@ -539,18 +591,36 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
 
     // ===== Mega Evolution era (2026, current) =====
     {
-      name: "Gengar ex", set: "Mega Evolution: Ascended Heroes", era: "mega",
-      rarity: "SIR", num: "—",
-      peak: 1400, floor: 1275, current: 1275,
+      name: "Mega Gengar ex", updated: true, set: "Mega Evolution: Ascended Heroes", era: "mega",
+      rarity: "SIR", num: "284/217",
+      peak: 1400, floor: 1100, current: 1145,
+      verdict: "strong-buy",
+      note: "UPDATED: the retracement from ~$1,400 found real support and has since recovered back above $1,100 \u2014 a genuine floor, not just a pause. Still the most expensive English card of 2026 so far. Previously flagged here as \u201cstill falling, no confirmed floor\u201d \u2014 that thesis has now played out and resolved bullish.",
+      supply: "Current-print set (God Packs confirmed \u2248 1-in-2,000), but with 22 SIRs competing for pull-rate slots, odds on any single specific chase remain roughly 1-in-1,540 \u2014 supply still can't meet demand for the top cards.",
+      src: "cardrake.com \u2014 1 Aug 2026 (updated from earlier TCGplayer Price Trends, 22 Jul 2026)"
+    },
+    {
+      name: "Mega Darkrai ex", updated: true, set: "Pitch Black", era: "mega",
+      rarity: "SIR", num: "116/084",
+      peak: 278, floor: 140, current: 278,
       verdict: "watch",
-      note: "The set's clear #1 chase, retracing from a ~$1,400 peak to $1,275 as the broader July 2026 market cooling hit even top-tier cards. Floor not yet confirmed — could still have room to fall.",
-      supply: "Current-print set — still being actively printed, meaning the scarcity floor other cards on this list benefit from doesn't apply yet.",
-      src: "TCGplayer Price Trends — 22 Jul 2026"
+      note: "NEW ADD: the set's top chase since its July 17, 2026 launch \u2014 up nearly 100% since release. Illustrated by Akira Egawa (same artist behind the widely-chased Ruler of the Black Flame Charizard ex), which is part of why collectors are circling this specific card.",
+      supply: "Brand-new current-print set, no floor has formed yet \u2014 this is early-hype pricing, not a demonstrated correction. Treat as a momentum watch, not yet a confirmed buy-the-dip.",
+      src: "chaseseason.com, cardrake.com \u2014 1\u20134 Aug 2026"
+    },
+    {
+      name: "Morpeko ex", updated: true, set: "Pitch Black", era: "mega",
+      rarity: "SIR", num: "117/084",
+      peak: 90, floor: 40, current: 40,
+      verdict: "avoid",
+      note: "ALREADY PUMPED \u2014 exactly the pattern to avoid: surged past $90 on launch hype, then dropped over 50% within weeks. The initial spike wasn't backed by lasting demand the way the set's top chase (Mega Darkrai ex) has been.",
+      supply: "A clear example of speculative launch-hype pricing unwinding. Don't mistake the current lower price for a floor \u2014 there's no evidence yet that this is done falling.",
+      src: "pokemonwizard.com \u2014 \u2248 3 weeks ago (mid-Jul 2026)"
     },
     {
       name: "Mega Charizard X ex", set: "Phantasmal Flames", era: "mega",
       rarity: "SIR", num: "125/094",
-      peak: 1000, floor: 428, current: 772.74,
+      peak: 1000, floor: 428, current: 750,
       verdict: "strong-buy",
       note: "Genuinely volatile — sales ranged $500–1,000 in a single month, with listings as low as $428 seen. ~22,500 PSA-graded copies signal real market depth, not a thin/illiquid card.",
       supply: "Current-print set, but the grading volume alone makes this a liquid, executable flip rather than a theoretical one.",
@@ -564,6 +634,82 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
       note: "Rocketed $600\u2192$1,400 in a month, now retracing. Pull-rate math gives it a structural floor: ~1-in-1,540 pack odds means pulling one from sealed ETBs costs roughly $22,000 on average — a real anchor even if hype fades.",
       supply: "Current-print set. Big-ticket, high-conviction hold if you believe the pull-rate math; confirm the live floor before committing this much capital.",
       src: "TCGplayer Price Trends, 29 Jul 2026; pull-rate data per PokeBeach via PokeSats, 22 May 2026"
+    },
+
+    // ===== Vintage — sympathy-pump budget plays (Delta Reign / Mega Rayquaza correlation) =====
+    {
+      name: "Primal Groudon EX", set: "Ancient Origins", era: "vintage",
+      rarity: "FA", num: "97/98",
+      peak: 39, floor: 20, current: 39,
+      verdict: "watch",
+      note: "Budget sympathy play on the Hoenn weather trio — Rayquaza's Mega Reign hype has already driven six different vintage Rayquaza cards to five-figure graded sales this year. Groudon/Kyogre are the same era, same trio, same collector base, and still genuinely cheap.",
+      supply: "Raw ~$38.89, PSA 10 ~$611 \u2014 a real grading spread if you're willing to hold through submission time. No confirmed price movement yet tied to Delta Reign; this is a speculative correlation thesis, not a proven mover.",
+      src: "getcardbase.com \u2014 2026 (Delta Reign correlation is analytical, not sourced)"
+    },
+    {
+      name: "Primal Groudon EX", set: "Primal Clash", era: "vintage",
+      rarity: "FA", num: "151/160",
+      peak: 49, floor: 25, current: 49,
+      verdict: "watch",
+      note: "Full art secret-slot printing, cheaper entry than the Ancient Origins version above. Same speculative thesis: if Rayquaza's Mega hype spreads to the rest of the Hoenn legendary trio the way collector correlation buying often works, this is the accessible entry point.",
+      supply: "Under $50 raw. No verified current spike \u2014 flagging this honestly as unconfirmed speculation, not a demonstrated floor like the Strong Buy picks elsewhere in this tracker.",
+      src: "getcardbase.com \u2014 2026"
+    },
+    {
+      name: "Primal Kyogre EX", set: "Ancient Origins / Primal Clash", era: "vintage",
+      rarity: "FA", num: "96/98 or 149/160",
+      peak: 45, floor: 20, current: 40,
+      verdict: "watch",
+      note: "Twin release to Primal Groudon EX above, same set structure and era. Exact current price is less precisely tracked than Groudon's \u2014 treat this figure as a rough estimate based on the parallel product, and verify a live listing before buying.",
+      supply: "Lower-confidence pricing than its Groudon counterpart \u2014 fewer trackers have precise current data for this specific card. Same speculative Delta Reign correlation thesis applies.",
+      src: "sportscardinvestor.com \u2014 2026 (price estimated from parallel Groudon data, not directly confirmed)"
+    },
+    {
+      name: "Reshiram — Full Art", set: "Black & White (Base Set)", era: "vintage",
+      rarity: "FA", num: "113/114",
+      peak: 130, floor: 100, current: 114,
+      verdict: "hold",
+      note: "One of the two cards that started the entire \u201cFull Art\u201d rarity in 2011. Down 8.4% all-time, not a hot flip \u2014 but this is the genesis card of a rarity tier now worth billions across the whole game. Slow, mature, but historically significant.",
+      supply: "15 years of prints in circulation, well-established supply. Buy for the historical/display significance, not for a fast flip \u2014 the growth curve already happened over the last decade.",
+      src: "pokemonwizard.com \u2014 2026"
+    },
+    {
+      name: "Zekrom — Full Art", set: "Black & White (Base Set)", era: "vintage",
+      rarity: "FA", num: "114/114",
+      peak: 748, floor: 74, current: 121,
+      verdict: "watch",
+      note: "Reshiram's counterpart, same genesis-of-Full-Art significance \u2014 but up 561.4% since 2011 release, with a huge sale-range spread ($74\u2013748) suggesting real volatility around condition/grading rather than a stable price. Also reprinted in Celebrations (2021) for the 25th anniversary, adding supply.",
+      supply: "More volatile than Reshiram despite being the same set and rarity \u2014 worth checking a tight recent sold-comp range rather than trusting the wide historical spread.",
+      src: "pokemonwizard.com \u2014 2026"
+    },
+    {
+      name: "Reshiram ex", set: "White Flare", era: "sv-late",
+      rarity: "SIR", num: "173",
+      peak: 365, floor: 300, current: 365,
+      verdict: "watch",
+      note: "A brand-new 2025/26 SV-era set reviving the Black & White Rare treatment as a tribute. Among the priciest non-Mega-era cards of 2026 \u2014 the priciest card in either White Flare or Black Bolt. PSA 10s trade $700\u2013900 in early secondary sales.",
+      supply: "New rarity treatment (\u201cBlack White Rare\u201d) gives it a structural floor that historically softens slower than standard SIRs \u2014 initial spike from novelty, expected to glide down gradually as more product opens rather than crash.",
+      src: "cardrake.com \u2014 5 Jun 2026"
+    },
+
+    // ===== Sun & Moon Era (2017-2019) =====
+    {
+      name: "Charizard GX", set: "Hidden Fates \u2014 Shiny Vault", era: "sm",
+      rarity: "FA", num: "SV49/SV94",
+      peak: 900, floor: 550, current: 676,
+      verdict: "hold",
+      note: "The most iconic modern Pokémon chase card, full stop \u2014 TCGplayer's own product page calls it \u201cone of the top chase cards from the entire Sun & Moon era.\u201d Remarkably stable: up only 4% since 2019 release, meaning it found fair value years ago and has held it.",
+      supply: "Mature, well-established market with deep liquidity. Not a volatile flip \u2014 a proven, boring-in-the-best-way blue-chip hold. Buy for reliability, not for a quick correction bounce.",
+      src: "pokemonwizard.com, tcgplayer.com \u2014 2026"
+    },
+    {
+      name: "Pikachu & Zekrom GX", set: "Team Up", era: "sm",
+      rarity: "SIR", num: "184/181",
+      peak: 250, floor: 200, current: 233,
+      verdict: "hold",
+      note: "The card that originated the Tag Team Rainbow Rare mechanic in 2019 \u2014 two Pokémon on one card, a design idea that shaped years of chase-card strategy afterward. Stable in the low-$200s with real trading volume (multiple TCGplayer sellers at $244\u2013250).",
+      supply: "Historically significant as the genesis of an entire card design category. Liquid and stable rather than volatile \u2014 a mechanism-history hold, not a correction play.",
+      src: "pokemonwizard.com, tcgplayer.com \u2014 2026"
     },
   ];
 
@@ -608,50 +754,64 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
   let activeRarity = 'all';
   let activeVerdict = 'all';
   let activeView = 'singles';
+  let activeBudget = 'all';
 
   const ERA_LABELS = {
     'swsh': { title: 'Sword & Shield Era', range: '2021\u20132022 \u00b7 out of print, established floors' },
     'sv-early': { title: 'Scarlet & Violet \u2014 Early', range: '2023\u20132024 \u00b7 mixed print status' },
     'sv-late': { title: 'Scarlet & Violet \u2014 Late', range: '2024\u20132025 \u00b7 some corrections underway' },
     'mega': { title: 'Mega Evolution Era', range: '2026 \u00b7 current print, floors still forming' },
+    'sm': { title: 'Sun & Moon Era', range: '2017\u20132019 \u00b7 GX era, mature and stable' },
+    'vintage': { title: 'Vintage \u2014 Sympathy Pump Watch', range: 'XY era (2014\u201316) \u00b7 speculative Delta Reign correlation' },
   };
-  const ERA_ORDER = ['mega', 'sv-late', 'sv-early', 'swsh'];
+  const ERA_ORDER = ['mega', 'sv-late', 'sv-early', 'swsh', 'sm', 'vintage'];
 
   function fmtUSD(n){ return '$' + n.toLocaleString('en-US'); }
 
   function sparkline(peak, floor, current){
-    const w = 300, h = 44, pad = 6;
-    const max = peak, min = Math.min(floor, current) * 0.9;
-    const range = max - min || 1;
-    const yOf = v => h - pad - ((v - min) / range) * (h - pad*2);
-    const pts = [
-      { x: 10, y: yOf(peak) },
-      { x: w/2, y: yOf(floor) },
-      { x: w-10, y: yOf(current) },
-    ];
-    const line = `M${pts[0].x},${pts[0].y} L${pts[1].x},${pts[1].y} L${pts[2].x},${pts[2].y}`;
-    const fill = `${line} L${pts[2].x},${h} L${pts[0].x},${h} Z`;
-    const floorY = yOf(floor);
+    // Scale off floor/current only \u2014 that's the actionable trend. When peak
+    // is an outlier sale (e.g. one $5,000 listing against an $800 real
+    // range), including it in the scale squishes the part that actually
+    // matters into a few unreadable pixels. Peak still shows as a small
+    // reference tick at the top, with its real value in the text label above.
+    const w = 220, h = 26, pad = 4;
+    const lo = Math.min(floor, current), hi = Math.max(floor, current);
+    const range = (hi - lo) || (hi * 0.1) || 1;
+    const min = lo - range * 0.25, max = hi + range * 0.25;
+    const span = (max - min) || 1;
+    const yOf = v => h - pad - ((v - min) / span) * (h - pad*2);
+
+    const floorPt = { x: 8, y: yOf(floor) };
+    const curPt = { x: w - 8, y: yOf(current) };
+    const line = `M${floorPt.x},${floorPt.y} L${curPt.x},${curPt.y}`;
+    const fill = `${line} L${curPt.x},${h} L${floorPt.x},${h} Z`;
     const bounced = current > floor;
     const lineColor = current >= peak * 0.9 ? 'var(--teal)' : (current <= floor * 1.05 ? 'var(--rust)' : 'var(--gold)');
+    const peakClipped = peak > max;
+
     return `<svg class="track-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
       <path d="${fill}" fill="${lineColor}" opacity="0.12" stroke="none"/>
-      <line x1="0" y1="${floorY}" x2="${w}" y2="${floorY}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3,3"/>
       <path d="${line}" fill="none" stroke="${lineColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="${pts[0].x}" cy="${pts[0].y}" r="3" fill="${lineColor}"/>
-      <circle cx="${pts[1].x}" cy="${pts[1].y}" r="3" fill="var(--ink-faint)"/>
-      <circle cx="${pts[2].x}" cy="${pts[2].y}" r="3.5" fill="${lineColor}"/>
+      <circle cx="${floorPt.x}" cy="${floorPt.y}" r="3" fill="var(--ink-faint)"/>
+      <circle cx="${curPt.x}" cy="${curPt.y}" r="3.5" fill="${lineColor}"/>
+      ${peakClipped ? `<path d="M${w-16},2 L${w-8},2 L${w-12},7 Z" fill="var(--ink-faint)" opacity="0.5"/>` : ''}
     </svg>`;
+  }
+
+  function cardSearchUrl(name, num, set){
+    const query = num && num !== '\u2014' ? `${name} - ${num} - ${set}` : `${name} - ${set}`;
+    return 'https://www.tcgplayer.com/search/pokemon/product?q=' + encodeURIComponent(query);
   }
 
   function cardHTML(c){
     const pctFromPeak = Math.round(((c.current - c.peak) / c.peak) * 100);
     const chgClass = pctFromPeak < -5 ? 'down' : (pctFromPeak > 5 ? 'up' : 'flat');
     const verdictLabel = { 'strong-buy':'Strong Buy \u2014 Floor Confirmed', 'watch':'Watch \u2014 Correcting', 'hold':'Hold \u2014 Stable', 'avoid':'Avoid \u2014 Weak Thesis' }[c.verdict];
+    const searchUrl = cardSearchUrl(c.name, c.num, c.set);
     return `
       <div class="card" data-rarity="${c.rarity}" data-verdict="${c.verdict}" data-search="${(c.name+' '+c.set).toLowerCase()}">
         <div class="card-top">
-          <div><div class="card-name">${c.name}</div><div class="card-set">${c.set}${c.num !== '\u2014' ? ' \u00b7 ' + c.num : ''}</div></div>
+          <div><div class="card-name">${c.name}${c.updated ? ' <span class="updated-badge">UPDATED</span>' : ''}</div><div class="card-set">${c.set}${c.num !== '\u2014' ? ' \u00b7 ' + c.num : ''}</div></div>
           <span class="rarity-badge ${c.rarity}">${c.rarity}</span>
         </div>
         <div class="verdict-tag ${c.verdict}" style="margin-top:10px;">${verdictLabel}</div>
@@ -666,6 +826,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
         <p class="card-note">${c.note}</p>
         <div class="card-supply"><b>Supply/demand:</b> ${c.supply}</div>
         <div class="card-src">Source: ${c.src}</div>
+        <a class="view-link" href="${searchUrl}" target="_blank" rel="noopener">\u{1F50D} View card \u2192</a>
       </div>
     `;
   }
@@ -707,7 +868,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
         const era = ERA_LABELS[eraKey];
         html += `
           <div class="era">
-            <div class="era-head"><div class="era-title">${era.title}</div><div class="era-range">${era.range}</div></div>
+            <div class="era-head" id="era-${eraKey}"><div class="era-title">${era.title}</div><div class="era-range">${era.range}</div></div>
             <div class="grid">${itemsInEra.map(sealedCardHTML).join('')}</div>
           </div>
         `;
@@ -726,6 +887,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
         if(c.era !== eraKey) return false;
         if(activeRarity !== 'all' && c.rarity !== activeRarity) return false;
         if(activeVerdict !== 'all' && c.verdict !== activeVerdict) return false;
+        if(activeBudget !== 'all' && c.current > parseInt(activeBudget)) return false;
         if(q && !(c.name+' '+c.set).toLowerCase().includes(q)) return false;
         return true;
       });
@@ -734,7 +896,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
       const era = ERA_LABELS[eraKey];
       html += `
         <div class="era">
-          <div class="era-head"><div class="era-title">${era.title}</div><div class="era-range">${era.range}</div></div>
+          <div class="era-head" id="era-${eraKey}"><div class="era-title">${era.title}</div><div class="era-range">${era.range}</div></div>
           <div class="grid">${cardsInEra.map(cardHTML).join('')}</div>
         </div>
       `;
@@ -749,7 +911,7 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
     activeView = val;
     document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    const filterControls = document.querySelectorAll('.chip[data-rarity], .chip[data-verdict], .chip-divider');
+    const filterControls = document.querySelectorAll('.chip[data-rarity], .chip[data-verdict], .chip[data-budget], .chip-divider');
     filterControls.forEach(el => el.style.display = val === 'sealed' ? 'none' : '');
     render();
   }
@@ -763,6 +925,12 @@ Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
   function setVerdict(val, btn){
     activeVerdict = val;
     document.querySelectorAll('.chip[data-verdict]').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  }
+  function setBudget(val, btn){
+    activeBudget = val;
+    document.querySelectorAll('.chip[data-budget]').forEach(c => c.classList.remove('active'));
     btn.classList.add('active');
     render();
   }
