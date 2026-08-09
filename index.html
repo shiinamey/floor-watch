@@ -1,35 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- PRICE_UPDATE_LOG [2026-08-09 09:09 PHT]: DRY RUN MODE (extraction not yet proven accurate -- see WARNING below if present). 0/28 cards would update
-Umbreon VMAX: WOULD UPDATE $550.0 -> $2212.5 (dry run, not written)
-Rayquaza VMAX: WOULD UPDATE $1104.0 -> $1002.1 (dry run, not written)
+<!-- PRICE_UPDATE_LOG [2026-08-07 16:28 PHT]: DRY RUN MODE (extraction not yet proven accurate -- see WARNING below if present). 0/28 cards would update
+Umbreon VMAX: WOULD UPDATE $550.0 -> $2159.37 (dry run, not written)
+Rayquaza VMAX: WOULD UPDATE $1104.0 -> $1039.35 (dry run, not written)
 Giratina VSTAR: SKIP (no card number to build URL from)
 Terapagos ex: REJECT ($1.65 vs last known $45.0 -- outside safe bounds, likely wrong-card match)
-Charizard ex: WOULD UPDATE $350.0 -> $383.98 (dry run, not written)
+Charizard ex: WOULD UPDATE $350.0 -> $367.33 (dry run, not written)
 Blastoise ex: WOULD UPDATE $180.0 -> $133.58 (dry run, not written)
 Venusaur ex: WOULD UPDATE $150.0 -> $103.27 (dry run, not written)
 Mew ex — \u201cBubble Mew\u201d: SKIP (no 'Ungraded' price table found)
 Shiny Charizard ex: WOULD UPDATE $260.0 -> $795.36 (dry run, not written)
-Umbreon ex: WOULD UPDATE $882.0 -> $1340.68 (dry run, not written)
-Pikachu ex: WOULD UPDATE $130.0 -> $289.19 (dry run, not written)
+Umbreon ex: WOULD UPDATE $882.0 -> $1425.0 (dry run, not written)
+Pikachu ex: WOULD UPDATE $130.0 -> $290.0 (dry run, not written)
 Latias EX: WOULD UPDATE $85.0 -> $170.73 (dry run, not written)
 Giratina VSTAR — Alt Art: WOULD UPDATE $75.0 -> $16.81 (dry run, not written)
 Giratina V — Alt Full Art: SKIP (no 'Ungraded' price table found)
 Team Rocket's Mewtwo ex: WOULD UPDATE $58.0 -> $20.05 (dry run, not written)
-Milotic EX: WOULD UPDATE $85.0 -> $108.1 (dry run, not written)
-Hydreigon EX: WOULD UPDATE $90.0 -> $35.87 (dry run, not written)
-Alolan Exeggutor EX: WOULD UPDATE $50.0 -> $28.49 (dry run, not written)
+Milotic EX: WOULD UPDATE $85.0 -> $111.47 (dry run, not written)
+Hydreigon EX: WOULD UPDATE $90.0 -> $35.64 (dry run, not written)
+Alolan Exeggutor EX: WOULD UPDATE $50.0 -> $31.89 (dry run, not written)
 Mega Charizard X ex: WOULD UPDATE $750.0 -> $795.36 (dry run, not written)
 Pikachu ex — \u201cTreekachu\u201d: SKIP (no 'Ungraded' price table found)
 Primal Groudon EX: WOULD UPDATE $39.0 -> $187.71 (dry run, not written)
-Primal Groudon EX: WOULD UPDATE $49.0 -> $104.0 (dry run, not written)
+Primal Groudon EX: WOULD UPDATE $49.0 -> $99.25 (dry run, not written)
 Primal Kyogre EX: REJECT ($230.5 vs last known $40.0 -- outside safe bounds, likely wrong-card match)
 Reshiram — Full Art: WOULD UPDATE $114.0 -> $65.0 (dry run, not written)
-Zekrom — Full Art: WOULD UPDATE $121.0 -> $80.5 (dry run, not written)
+Zekrom — Full Art: WOULD UPDATE $121.0 -> $73.34 (dry run, not written)
 Reshiram ex: WOULD UPDATE $365.0 -> $473.54 (dry run, not written)
 Charizard GX: SKIP (no card number to build URL from)
-Pikachu & Zekrom GX: WOULD UPDATE $233.0 -> $188.41 (dry run, not written)
+Pikachu & Zekrom GX: WOULD UPDATE $233.0 -> $192.5 (dry run, not written)
 
 WARNING: 1 price value(s) extracted for MULTIPLE unrelated cards -- extraction is likely grabbing a generic page element, not the actual card price:
   $795.36: Shiny Charizard ex, Mega Charizard X ex
@@ -59,14 +59,41 @@ WARNING: 1 price value(s) extracted for MULTIPLE unrelated cards -- extraction i
   *{box-sizing:border-box; margin:0; padding:0;}
   html{-webkit-text-size-adjust:100%;}
   body{
-    background:
-      radial-gradient(900px 500px at 10% -10%, rgba(212,160,84,0.06), transparent 60%),
-      radial-gradient(800px 450px at 100% 0%, rgba(79,174,156,0.06), transparent 55%),
-      var(--bg);
+    background: var(--bg);
     color:var(--ink);
     font-family:'Inter',sans-serif;
     min-height:100vh;
     padding-bottom:60px;
+    position:relative;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:'';
+    position:fixed; inset:-25%; z-index:-1;
+    pointer-events:none;
+    animation:bgDrift 55s ease-in-out infinite alternate;
+    transition:background 1.8s ease;
+    background:
+      radial-gradient(900px 500px at 30% 20%, rgba(212,160,84,0.06), transparent 60%),
+      radial-gradient(800px 450px at 70% 80%, rgba(79,174,156,0.06), transparent 55%);
+  }
+  body.mood-bullish::before{
+    background:
+      radial-gradient(950px 550px at 30% 20%, rgba(79,174,156,0.10), transparent 60%),
+      radial-gradient(800px 450px at 70% 80%, rgba(79,174,156,0.05), transparent 55%);
+  }
+  body.mood-bearish::before{
+    background:
+      radial-gradient(950px 550px at 30% 20%, rgba(193,96,74,0.09), transparent 60%),
+      radial-gradient(800px 450px at 70% 80%, rgba(212,160,84,0.04), transparent 55%);
+  }
+  @keyframes bgDrift{
+    0%{ transform:translate(0,0) scale(1); }
+    50%{ transform:translate(-3%,2%) scale(1.06); }
+    100%{ transform:translate(2%,-3%) scale(1); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    body::before{ animation:none; }
   }
   ::selection{background:var(--gold); color:#1a1305;}
 
@@ -233,7 +260,20 @@ WARNING: 1 price value(s) extracted for MULTIPLE unrelated cards -- extraction i
     padding:16px;
     position:relative;
     overflow:hidden;
+    transform-style:preserve-3d;
+    transition:transform .12s ease-out, border-color .2s ease;
+    will-change:transform;
   }
+  .card::after{
+    content:'';
+    position:absolute; inset:0;
+    background:radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.12), transparent 42%);
+    opacity:0; transition:opacity .3s ease;
+    pointer-events:none; border-radius:inherit;
+  }
+  .card:hover{ border-color:var(--gold-dim); }
+  .card:hover::after{ opacity:1; }
+  @media (hover: none){ .card::after{ display:none; } }
   .card-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
   .card-thumb{
     width:44px; height:61px; border-radius:5px; background:var(--surface2); border:1px solid var(--line);
@@ -353,7 +393,22 @@ WARNING: 1 price value(s) extracted for MULTIPLE unrelated cards -- extraction i
     border:1px solid var(--line);
     border-radius:10px;
     padding:18px;
+    position:relative;
+    overflow:hidden;
+    transform-style:preserve-3d;
+    transition:transform .12s ease-out, border-color .2s ease;
+    will-change:transform;
   }
+  .sealed-card::after{
+    content:'';
+    position:absolute; inset:0;
+    background:radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.10), transparent 42%);
+    opacity:0; transition:opacity .3s ease;
+    pointer-events:none; border-radius:inherit;
+  }
+  .sealed-card:hover{ border-color:var(--gold-dim); }
+  .sealed-card:hover::after{ opacity:1; }
+  @media (hover: none){ .sealed-card::after{ display:none; } }
   .sealed-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px; }
   .sealed-name{ font-family:'Fraunces',serif; font-size:17px; font-weight:600; }
   .sealed-set{ font-size:12px; color:var(--ink-faint); margin-top:3px; }
@@ -961,6 +1016,35 @@ WARNING: 1 price value(s) extracted for MULTIPLE unrelated cards -- extraction i
     `;
   }
 
+  /* ---------- Card hover tilt + holo shine ---------- */
+  function attachTilt(selector){
+    document.querySelectorAll(selector).forEach(el => {
+      el.addEventListener('mousemove', (e) => {
+        const rect = el.getBoundingClientRect();
+        const cx = (e.clientX - rect.left) / rect.width;
+        const cy = (e.clientY - rect.top) / rect.height;
+        const rotateY = (cx - 0.5) * 8;
+        const rotateX = (0.5 - cy) * 8;
+        el.style.transform = `perspective(700px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.015)`;
+        el.style.setProperty('--mx', (cx * 100) + '%');
+        el.style.setProperty('--my', (cy * 100) + '%');
+      });
+      el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+    });
+  }
+
+  /* ---------- Data-driven background mood ---------- */
+  function applyMoodBackground(){
+    const strongBuy = CARDS.filter(c => c.verdict === 'strong-buy').length;
+    const avoid = CARDS.filter(c => c.verdict === 'avoid').length;
+    const total = CARDS.length || 1;
+    const bullish = strongBuy / total, bearish = avoid / total;
+    document.body.classList.remove('mood-bullish', 'mood-bearish');
+    if(bullish > bearish + 0.08) document.body.classList.add('mood-bullish');
+    else if(bearish > bullish + 0.08) document.body.classList.add('mood-bearish');
+  }
+  applyMoodBackground();
+
   function render(){
     const container = document.getElementById('cardContainer');
     const q = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -987,6 +1071,7 @@ WARNING: 1 price value(s) extracted for MULTIPLE unrelated cards -- extraction i
       container.innerHTML = html;
       document.getElementById('emptyState').style.display = visibleTotal === 0 ? 'block' : 'none';
       document.getElementById('resultCount').textContent = `Showing ${visibleTotal} of ${SEALED.length} tracked sealed products`;
+      attachTilt('.sealed-card');
       return;
     }
 
@@ -1017,6 +1102,7 @@ WARNING: 1 price value(s) extracted for MULTIPLE unrelated cards -- extraction i
     document.getElementById('emptyState').style.display = visibleTotal === 0 ? 'block' : 'none';
     document.getElementById('resultCount').textContent = `Showing ${visibleTotal} of ${CARDS.length} tracked hits`;
     if(activeView !== 'sealed') fetchThumbsForVisibleCards();
+    attachTilt('.card');
   }
 
   function setView(val, btn){
